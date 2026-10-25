@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Login — Boomerang{% endblock %}
+
+{% block content %}
+<div class="form-page-bg my-3">
+    <div class="row justify-content-center align-items-center">
+        <div class="col-md-6 col-lg-5">
+            <div class="form-card-white p-4 p-md-5">
+                <div class="text-center mb-4">
+                    <span class="d-inline-flex align-items-center justify-content-center bg-primary text-white rounded-circle mb-2" style="width: 52px; height: 52px;">
+                        <i class="bi bi-box-arrow-in-right fs-4"></i>
+                    </span>
+                    <h3 class="fw-bold mb-1 text-dark">Welcome back</h3>
+                    <p class="text-muted small">Sign in to Boomerang</p>
+                </div>
+
+                <form method="POST" action="{{ url_for('login') }}">
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold small text-dark">Campus Email</label>
+                        <input type="email" name="email" class="form-control rounded-3 py-2 shadow-none" placeholder="name@campus.com" required>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold small text-dark">Password</label>
+                        <input type="password" name="password" class="form-control rounded-3 py-2 shadow-none" placeholder="••••••••" required>
+                    </div>
+                    <button type="submit" class="btn btn-boomerang w-100 py-2 rounded-pill">Sign In</button>
+                </form>
+
+                <div class="mt-4 text-center small text-muted">
+                    Need an account? <a href="{{ url_for('register') }}" class="text-primary fw-bold text-decoration-none">Register here</a>
+                </div>
+
+                <div class="mt-4 p-3 rounded-4 small" style="background: #f0f7ff; border: 1px solid #bfdbfe;">
+                    <div class="fw-bold text-primary mb-1">Demo Access:</div>
+                    <div class="d-flex justify-content-between text-muted"><span>Admin:</span> <code>admin@campus.com / admin123</code></div>
+                    <div class="d-flex justify-content-between text-muted"><span>Student:</span> <code>demo@campus.com / demo123</code></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

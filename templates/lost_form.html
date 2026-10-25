@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+{% block title %}Report Lost Item — Boomerang{% endblock %}
+
+{% block content %}
+<!-- Darker & Richer Blue Canvas Background -->
+<div class="dark-blue-canvas my-3">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Pure White Form Container -->
+            <div class="card-white-pop p-4 p-md-5">
+                <div class="border-bottom pb-3 mb-4">
+                    <span class="badge bg-primary text-white px-3 py-2 rounded-pill fw-bold mb-2">Step 1 of 1</span>
+                    <h2 class="fw-extrabold mb-1 text-dark">Report a Lost Belonging</h2>
+                    <p class="text-muted small mb-0">Describe your item publicly, then provide secret verification questions only you know.</p>
+                </div>
+
+                <form method="POST" action="{{ url_for('lost_new') }}" enctype="multipart/form-data">
+                    <!-- Section 1 -->
+                    <div class="mb-4">
+                        <h5 class="fw-bold text-primary d-flex align-items-center gap-2 mb-3">
+                            <i class="bi bi-eye-fill"></i> 1. Public Details (Visible on Feed)
+                        </h5>
+                        
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-8">
+                                <label class="form-label small fw-semibold text-dark">Item Name *</label>
+                                <input type="text" name="name" class="form-control rounded-3 py-2" placeholder="e.g. Blue Hydro Flask / Sony Headphones" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label small fw-semibold text-dark">Category *</label>
+                                <select name="category" id="categorySelect" class="form-select rounded-3 py-2" required>
+                                    {% for cat_name in (cats or categories or {}).keys() %}
+                                    <option value="{{ cat_name }}">{{ cat_name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label small fw-semibold text-dark">Date Lost *</label>
+                                <input type="date" name="date" class="form-control rounded-3 py-2" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-semibold text-dark">Approximate Location</label>
+                                <input type="text" name="place" class="form-control rounded-3 py-2" placeholder="e.g. Near Cafeteria / Library 2nd floor">
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold text-dark">Public Physical Description *</label>
+                            <textarea name="description" class="form-control rounded-3" rows="3" placeholder="Outer physical appearance (color, size, shape). DO NOT put unique confidential marks here!" required></textarea>
+                        </div>
+
+                        <div>
+                            <label class="form-label small fw-semibold text-dark">Item Photo (Optional)</label>
+                            <input type="file" name="photo" class="form-control rounded-3" accept="image/*">
+                            <div class="form-text small">Our AI compares this image against photos submitted by finders.</div>
+                        </div>
+                    </div>
+
+                    <!-- Section 2: Verification Questions -->
+                    <div class="p-4 rounded-4 mb-4" style="background: #eff6ff; border: 2px dashed #bfdbfe;">
+                        <h5 class="fw-bold text-dark d-flex align-items-center gap-2 mb-2">
+                            <i class="bi bi-shield-lock-fill text-primary"></i> 2. Private AI Verification Vault
+                        </h5>
+                        <p class="text-muted small mb-3">
+                            These questions are private. Finders must match your answers to prove ownership.
+                        </p>
+
+                        <div id="featuresContainer" class="d-flex flex-column gap-2 mb-3"></div>
+
+                        <button type="button" class="btn btn-outline-primary btn-sm rounded-pill px-3" onclick="addCustomFeature()">
+                            <i class="bi bi-plus-circle me-1"></i> Add Custom Private Question
+                        </button>
+                    </div>
+
+                    <div class="d-grid pt-2">
+                        <button type="submit" class="btn btn-boomerang py-3 fs-6">
+                            Publish Lost Report
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script id="categories-data" type="application/json">
+{{ (cats or categories or {}) | tojson | safe }}
+</script>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const dataElement = document.getElementById("categories-data");
+let categoryQuestions = {};
+try {
+    categoryQuestions = JSON.parse(dataElement.textContent || "{}");
+} catch (e) {
+    console.error("Failed to parse category questions:", e);
+}
+
+function renderQuestions(cat) {
+    const container = document.getElementById("featuresContainer");
+    if (!container) return;
+    container.innerHTML = "";
+    const list = categoryQuestions[cat] || ["Colour", "Special Mark"];
+
+    list.forEach(function(qText) {
+        addFeatureRow(qText, "");
+    });
+}
+
+function addFeatureRow(qText, aText) {
+    const container = document.getElementById("featuresContainer");
+    if (!container) return;
+    const div = document.createElement("div");
+    div.className = "row g-2 align-items-center feature-row bg-white p-2 rounded-3 border shadow-sm";
+    div.innerHTML = `
+        <div class="col-md-5">
+            <input type="text" name="fq" class="form-control form-control-sm border-0 bg-light" value="${qText || ''}" placeholder="Question" required>
+        </div>
+        <div class="col-md-6">
+            <input type="text" name="fa" class="form-control form-control-sm border-0 bg-light" value="${aText || ''}" placeholder="Private Answer" required>
+        </div>
+        <div class="col-md-1 text-center">
+            <button type="button" class="btn btn-sm btn-link text-danger p-0" onclick="this.closest('.feature-row').remove()" title="Remove"><i class="bi bi-trash3"></i></button>
+        </div>
+    `;
+    container.appendChild(div);
+}
+
+function addCustomFeature() {
+    addFeatureRow("", "");
+}
+
+const catSelect = document.getElementById("categorySelect");
+if (catSelect) {
+    catSelect.addEventListener("change", function(e) {
+        renderQuestions(e.target.value);
+    });
+    renderQuestions(catSelect.value);
+}
+</script>
+{% endblock %}

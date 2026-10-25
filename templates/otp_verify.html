@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Handover Desk OTP Verification — Boomerang{% endblock %}
+
+{% block content %}
+<div class="dark-blue-canvas my-3">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div class="card-white-pop p-4 p-md-5 text-center">
+                <span class="badge bg-primary text-white px-3 py-2 rounded-pill fw-bold mb-2">Campus Security / Desk</span>
+                <h3 class="fw-extrabold text-dark mb-1">Verify Handover OTP</h3>
+                <p class="text-muted small mb-4">
+                    For Security Guards & Finders: Enter the 6-digit OTP provided by the owner to verify and complete item return.
+                </p>
+
+                <form method="POST" action="{{ url_for('otp_verify_page') }}" class="text-start">
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-dark">Claim ID or Item ID *</label>
+                        <input type="number" name="claim_id" class="form-control rounded-3 py-2" placeholder="e.g. 1, 2, 3 (from claim card)" required>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label small fw-bold text-dark">6-Digit Secret Owner OTP *</label>
+                        <input type="text" name="otp" maxlength="6" pattern="\d{6}" class="form-control rounded-3 py-3 text-center fw-bold fs-4" placeholder="••••••" required style="letter-spacing: 0.3em;">
+                    </div>
+
+                    <button type="submit" class="btn btn-boomerang w-100 py-3 fs-6">
+                        <i class="bi bi-shield-check me-2"></i> Verify OTP & Mark Returned (+50 Karma)
+                    </button>
+                </form>
+
+                <div class="mt-4 p-3 bg-light rounded-4 small text-muted text-start border">
+                    <i class="bi bi-info-circle-fill text-primary me-1"></i> <strong>How it works:</strong> The true owner has the 6-digit OTP on their Boomerang dashboard. When they show it at the gate or to the finder, entering it here completes the legal handover.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

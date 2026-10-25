@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}Register — Boomerang{% endblock %}
+
+{% block content %}
+<div class="form-page-bg my-3">
+    <div class="row justify-content-center">
+        <div class="col-md-7 col-lg-6">
+            <div class="form-card-white p-4 p-md-5">
+                <div class="text-center mb-4">
+                    <span class="d-inline-flex align-items-center justify-content-center bg-primary text-white rounded-circle mb-2" style="width: 52px; height: 52px;">
+                        <i class="bi bi-person-badge fs-4"></i>
+                    </span>
+                    <h3 class="fw-bold mb-1 text-dark">Join Boomerang</h3>
+                    <p class="text-muted small">Campus Lost & Found Portal</p>
+                </div>
+
+                <form method="POST" action="{{ url_for('register') }}">
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold small text-dark">Full Name</label>
+                        <input type="text" name="name" class="form-control rounded-3 py-2 shadow-none" placeholder="e.g. Rahul Sharma" required>
+                    </div>
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold small text-dark">College Email</label>
+                            <input type="email" name="email" class="form-control rounded-3 py-2 shadow-none" placeholder="id@campus.com" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold small text-dark">Mobile Number</label>
+                            <input type="tel" name="phone" class="form-control rounded-3 py-2 shadow-none" placeholder="10-digit phone" required>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold small text-dark">Department</label>
+                        <input type="text" name="dept" class="form-control rounded-3 py-2 shadow-none" placeholder="e.g. CSE, ECE, Mechanical" required>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold small text-dark">Password</label>
+                        <input type="password" name="password" class="form-control rounded-3 py-2 shadow-none" placeholder="••••••••" required>
+                    </div>
+                    <button type="submit" class="btn btn-boomerang w-100 py-2 rounded-pill">Create Account</button>
+                </form>
+
+                <div class="mt-4 text-center small text-muted">
+                    Already registered? <a href="{{ url_for('login') }}" class="text-primary fw-bold text-decoration-none">Sign in</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

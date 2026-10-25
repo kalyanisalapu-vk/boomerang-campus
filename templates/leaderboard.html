@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block title %}Campus Heroes Leaderboard — Boomerang{% endblock %}
+
+{% block content %}
+<!-- Leaderboard Hero Header -->
+<div class="dark-blue-canvas text-white p-4 p-md-5 mb-4 text-center">
+    <span class="badge bg-warning text-dark px-3 py-2 rounded-pill fw-bold mb-3 shadow-sm">
+        <i class="bi bi-trophy-fill me-1"></i> Hall of Fame
+    </span>
+    <h2 class="display-6 fw-extrabold mb-2" style="font-weight: 900;">Campus Heroes Leaderboard</h2>
+    <p class="text-light opacity-75 mb-3">Celebrating students who make our campus honest, helpful, and connected.</p>
+    <div class="d-inline-flex gap-3 bg-white bg-opacity-10 p-2 px-4 rounded-pill border border-light border-opacity-10 small">
+        <span>🏆 Total Items Safely Returned: <strong>{{ total_returned }}</strong></span>
+        <span>•</span>
+        <span>✨ 50 Karma per verified return</span>
+    </div>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-lg-9">
+        <div class="card card-white-pop p-4">
+            <h5 class="fw-bold mb-3 d-flex align-items-center gap-2 text-dark">
+                <i class="bi bi-award text-primary"></i> Top Campus Contributors
+            </h5>
+
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr class="small text-uppercase text-muted">
+                            <th style="width: 80px;">Rank</th>
+                            <th>Student</th>
+                            <th>Department</th>
+                            <th>Honour Badge</th>
+                            <th class="text-end">Karma Points</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for h in heroes %}
+                        <tr>
+                            <td>
+                                {% if loop.index == 1 %}
+                                <span class="badge bg-warning text-dark rounded-circle p-2 fs-6">🥇 1</span>
+                                {% elif loop.index == 2 %}
+                                <span class="badge bg-secondary-subtle text-secondary border rounded-circle p-2 fs-6">🥈 2</span>
+                                {% elif loop.index == 3 %}
+                                <span class="badge bg-danger-subtle text-danger border rounded-circle p-2 fs-6">🥉 3</span>
+                                {% else %}
+                                <span class="fw-bold text-muted ms-2">#{{ loop.index }}</span>
+                                {% endif %}
+                            </td>
+                            <td class="fw-bold text-dark">{{ h.name }}</td>
+                            <td><span class="badge bg-light text-secondary border">{{ h.dept }}</span></td>
+                            <td>
+                                {% if h.karma >= 200 %}
+                                <span class="badge bg-primary text-white rounded-pill px-3 py-1">💎 Campus Legend</span>
+                                {% elif h.karma >= 100 %}
+                                <span class="badge bg-success text-white rounded-pill px-3 py-1">🥇 Good Samaritan</span>
+                                {% else %}
+                                <span class="badge bg-info text-dark rounded-pill px-3 py-1">🥈 Campus Guardian</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-end fw-extrabold text-primary fs-5">
+                                {{ h.karma }} <small class="fs-6 fw-normal text-muted">pts</small>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="5" class="text-center py-4 text-muted">No heroes recorded yet. Be the first to return an item!</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

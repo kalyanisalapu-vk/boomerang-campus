@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}Reverse AI Match Result — Boomerang{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-9">
+        <div class="card-white-pop p-4 p-md-5 mb-4">
+            <div class="d-flex justify-content-between align-items-center border-bottom pb-3 mb-4">
+                <div>
+                    <span class="badge bg-success text-white px-3 py-2 rounded-pill fw-bold mb-2">Reverse AI Auto-Match</span>
+                    <h3 class="fw-bold mb-0 text-dark">AI Found a Probable Match!</h3>
+                </div>
+                <span class="status-pill status-found fs-6 px-3 py-2">
+                    {{ (f_rep.match_score * 100)|round|int }}% MATCH
+                </span>
+            </div>
+
+            <div class="p-3 mb-4 rounded-4 bg-success-subtle border border-success-subtle text-success-emphasis">
+                <div class="fw-bold fs-5 mb-1"><i class="bi bi-check-circle-fill me-2"></i>Match Confidence: {{ (f_rep.match_score * 100)|round|int }}%</div>
+                <div class="small">{{ f_rep.match_reason }}</div>
+            </div>
+
+            <!-- Dual Comparison -->
+            <div class="row g-4 mb-4">
+                <div class="col-md-6">
+                    <div class="p-3 rounded-4 bg-light border text-center h-100">
+                        <span class="badge bg-primary rounded-pill mb-2">Item You Found</span>
+                        <h5 class="fw-bold text-dark">{{ f_rep.name }}</h5>
+                        <p class="small text-muted mb-2">{{ f_rep.place }}</p>
+                        {% if f_rep.photo %}
+                        <img src="{{ url_for('static', filename='uploads/' + f_rep.photo) }}" class="rounded-3 img-fluid shadow-sm" style="max-height: 180px; object-fit: contain;">
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="p-3 rounded-4 bg-light border text-center h-100">
+                        <span class="badge bg-danger rounded-pill mb-2">Original Lost Report</span>
+                        <h5 class="fw-bold text-dark">{{ lost_it.name }}</h5>
+                        <p class="small text-muted mb-2">Owner: {{ lost_owner.name }} ({{ lost_owner.dept }})</p>
+                        {% if lost_it.photo %}
+                        <img src="{{ url_for('static', filename='uploads/' + lost_it.photo) }}" class="rounded-3 img-fluid shadow-sm" style="max-height: 180px; object-fit: contain;">
+                        {% else %}
+                        <div class="py-5 text-muted small">No photo uploaded by owner</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-4 rounded-4 mb-4 border border-primary-subtle" style="background: #eff6ff;">
+                <h5 class="fw-bold text-primary mb-2"><i class="bi bi-person-lines-fill me-1"></i> Owner Contact for Handover:</h5>
+                <div class="row g-2 small">
+                    <div class="col-sm-6"><strong>Name:</strong> {{ lost_owner.name }} ({{ lost_owner.dept }})</div>
+                    <div class="col-sm-6"><strong>Phone:</strong> <a href="tel:{{ lost_owner.phone }}">{{ lost_owner.phone }}</a></div>
+                    <div class="col-sm-12"><strong>Email:</strong> <a href="mailto:{{ lost_owner.email }}">{{ lost_owner.email }}</a></div>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center">
+                <a href="{{ url_for('dashboard') }}" class="btn btn-light rounded-pill border px-4">Back to Dashboard</a>
+                <span class="text-success fw-bold small"><i class="bi bi-award-fill me-1"></i> +50 Karma Points credited on handover completion!</span>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

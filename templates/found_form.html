@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}Claim Found Item — Boomerang{% endblock %}
+
+{% block content %}
+<div class="dark-blue-canvas my-3">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card-white-pop p-4 p-md-5">
+                <div class="d-flex justify-content-between align-items-center border-bottom pb-3 mb-4">
+                    <div>
+                        <span class="badge bg-primary text-white px-3 py-2 rounded-pill fw-bold mb-2">Claim Process</span>
+                        <h2 class="fw-extrabold mb-0 text-dark">{{ it.name }}</h2>
+                        <p class="text-muted small mb-0">Reported lost on {{ it.date }} near {{ it.place or 'Campus' }}</p>
+                    </div>
+                    <a href="{{ url_for('item', iid=it.id) }}" class="btn btn-light border rounded-pill btn-sm px-3">Cancel</a>
+                </div>
+
+                <div class="alert alert-info border-0 rounded-4 d-flex align-items-center gap-3 p-3 mb-4" style="background: #eff6ff; color: #1e40af;">
+                    <i class="bi bi-shield-check fs-3"></i>
+                    <div class="small">
+                        <strong>AI Security Shield:</strong> The answers you submit will be compared by AI against the original owner's private verification details. You have <strong>3 total attempts</strong>.
+                    </div>
+                </div>
+
+                <form method="POST" action="{{ url_for('found', iid=it.id) }}" enctype="multipart/form-data">
+                    <div class="mb-4">
+                        <label class="form-label fw-bold text-dark">1. Upload Photo of Found Item <span class="text-danger">* (Mandatory)</span></label>
+                        <div class="p-4 rounded-4 text-center" style="background: #f8fafc; border: 2px dashed #93c5fd;">
+                            <i class="bi bi-camera-fill text-primary fs-1 d-block mb-2"></i>
+                            <input type="file" name="photo" class="form-control rounded-3" accept="image/*" required>
+                            <div class="form-text small mt-2">Take a clear picture of the actual item you found.</div>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold text-dark">2. Where did you find it? <span class="text-danger">*</span></label>
+                        <textarea name="description" class="form-control rounded-3" rows="2" placeholder="e.g. Found on Table 3, Science Block around 2 PM" required></textarea>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold d-block mb-2 text-dark">3. Answer Private Verification Questions</label>
+                        <div class="d-flex flex-column gap-3">
+                            {% for f in feats %}
+                            <div class="p-3 rounded-4 border" style="background: #f8fafc;">
+                                <label class="form-label fw-semibold text-dark small mb-2 d-flex align-items-center gap-2">
+                                    <span class="badge bg-primary text-white rounded-circle p-1" style="width: 22px; height: 22px; display: inline-flex; align-items: center; justify-content: center;">{{ loop.index }}</span>
+                                    {{ f.q }}
+                                </label>
+                                <input type="text" name="ans" class="form-control rounded-3 bg-white" placeholder="Type your answer here..." required>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="d-grid pt-2">
+                        <button type="submit" class="btn btn-boomerang py-3 fs-6">
+                            <i class="bi bi-cpu me-2"></i> Run AI Verification
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+{% block title %}Executive Admin Portal — Campus Find It{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+    <div>
+        <h2 class="fw-extrabold mb-1"><i class="bi bi-shield-lock-fill text-warning me-2"></i>Campus Admin Portal</h2>
+        <p class="text-muted small mb-0">Oversee college belongings while preserving full student confidentiality.</p>
+    </div>
+    <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle px-3 py-2 rounded-pill fw-bold">
+        <i class="bi bi-lock-fill me-1"></i> Data Masking Active
+    </span>
+</div>
+
+<!-- Stats Row -->
+<div class="row g-3 mb-4">
+    <div class="col-sm-6 col-lg-3">
+        <div class="card-modern p-3 border-start border-danger border-4">
+            <div class="text-muted small fw-bold text-uppercase">Lost Active</div>
+            <h3 class="fw-extrabold text-danger mb-0">{{ stats.lost }}</h3>
+        </div>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+        <div class="card-modern p-3 border-start border-warning border-4">
+            <div class="text-muted small fw-bold text-uppercase">AI Matched</div>
+            <h3 class="fw-extrabold text-warning mb-0">{{ stats.matched }}</h3>
+        </div>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+        <div class="card-modern p-3 border-start border-success border-4">
+            <div class="text-muted small fw-bold text-uppercase">Found & Confirmed</div>
+            <h3 class="fw-extrabold text-success mb-0">{{ stats.found }}</h3>
+        </div>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+        <div class="card-modern p-3 border-start border-secondary border-4">
+            <div class="text-muted small fw-bold text-uppercase">Returned</div>
+            <h3 class="fw-extrabold text-secondary mb-0">{{ stats.returned }}</h3>
+        </div>
+    </div>
+</div>
+
+<!-- Items Table -->
+<div class="card-modern p-4 mb-4">
+    <h5 class="fw-bold mb-3">Campus Belongs Database</h5>
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr class="small text-uppercase text-muted">
+                    <th>Item</th>
+                    <th>Category</th>
+                    <th>Owner (Confidential)</th>
+                    <th>Status</th>
+                    <th class="text-end">Manage</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for it in items %}
+                <tr>
+                    <td class="fw-bold text-dark">{{ it.name }}</td>
+                    <td><span class="badge bg-light text-secondary border">{{ it.category }}</span></td>
+                    <td>
+                        {{ it.oname }}<br>
+                        <small class="text-muted"><code>{{ mask(it.oemail) }}</code> • <code>{{ mask(it.ophone) }}</code></small>
+                    </td>
+                    <td><span class="status-pill status-{{ it.status }}">{{ it.status }}</span></td>
+                    <td class="text-end">
+                        <div class="d-inline-flex gap-1">
+                            {% if it.status != 'returned' %}
+                            <form method="POST" action="{{ url_for('admin_returned', iid=it.id) }}">
+                                <button type="submit" class="btn btn-sm btn-outline-success rounded-pill px-2" title="Mark Returned">Returned</button>
+                            </form>
+                            {% endif %}
+                            <form method="POST" action="{{ url_for('admin_delete', iid=it.id) }}" onsubmit="return confirm('Delete this item?');">
+                                <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-2" title="Delete"><i class="bi bi-trash"></i></button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Claims Audit -->
+<div class="card-modern p-4">
+    <h5 class="fw-bold mb-3">Claims Audit Log</h5>
+    <div class="table-responsive">
+        <table class="table table-sm table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr class="small text-uppercase text-muted">
+                    <th>Claim #</th>
+                    <th>Item Name</th>
+                    <th>Finder (Masked)</th>
+                    <th>Status</th>
+                    <th>Time</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for c in claims %}
+                <tr>
+                    <td>#{{ c.id }}</td>
+                    <td class="fw-bold">{{ c.iname }}</td>
+                    <td>{{ c.fname }} (<code>{{ mask(c.femail) }}</code>)</td>
+                    <td><span class="status-pill status-{{ c.status }}">{{ c.status }}</span></td>
+                    <td class="small text-muted">{{ c.created }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

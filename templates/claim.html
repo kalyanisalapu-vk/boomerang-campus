@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+{% block title %}Claim #{{ c['id'] }} Handover — Boomerang{% endblock %}
+
+{% block content %}
+{% set is_match = (res.get('match') if (res is mapping and res.get('match')) else false) %}
+{% set conf = (res.get('confidence', 0.0)|float if res is mapping else 0.0) %}
+{% set score = (conf * 100)|int %}
+{% set reason = (res.get('reason', 'Verification processed successfully.') if res is mapping else 'No verification details available.') %}
+{% set is_owner = (current_user and current_user['id'] == it['owner_id']) %}
+{% set is_finder = (current_user and current_user['id'] == c['finder_id']) %}
+
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card-white-pop p-4 p-md-5 mb-5">
+            <div class="d-flex justify-content-between align-items-center border-bottom pb-3 mb-4">
+                <div>
+                    <span class="text-muted small">Claim Case #{{ c['id'] }}</span>
+                    <h3 class="fw-bold mb-0 text-dark">Verification & Handover</h3>
+                </div>
+                {% if c['status'] == 'confirmed' %}
+                <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-2 rounded-pill fw-bold">ITEM RETURNED</span>
+                {% elif is_match %}
+                <span class="status-pill status-found fs-6 px-3 py-2">MATCH VERIFIED</span>
+                {% else %}
+                <span class="status-pill status-lost fs-6 px-3 py-2">VERIFICATION FAILED</span>
+                {% endif %}
+            </div>
+
+            <!-- Confidence Progress Meter (0 CSS Linter Errors) -->
+            {% if is_match %}
+            <div class="p-4 rounded-4 mb-4 bg-success-subtle border border-success-subtle text-success-emphasis">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="fw-bold fs-5"><i class="bi bi-check-circle-fill me-2"></i>Match Confidence</span>
+                    <span class="fs-4 fw-extrabold">{{ score }}%</span>
+                </div>
+                <div class="progress rounded-pill bg-white mb-2" style="height: 10px;">
+                    <div class="progress-bar bg-success" id="progressBarEl" data-width="{{ score }}"></div>
+                </div>
+                <div class="small opacity-75">{{ reason }}</div>
+            </div>
+            {% endif %}
+
+            <!-- ============================================== -->
+            <!-- OTP SECTION: OWNER SEES OTP, FINDER ENTERS OTP -->
+            <!-- ============================================== -->
+            {% if is_match and c['status'] != 'confirmed' %}
+                
+                <!-- 1. LOST PERSON (OWNER) VIEW: Displays Secret OTP -->
+                {% if is_owner %}
+                <div class="dark-blue-canvas p-4 text-white text-center mb-4">
+                    <span class="badge bg-warning text-dark px-3 py-1 rounded-pill fw-bold mb-2">
+                        <i class="bi bi-shield-lock-fill me-1"></i> Your Secret Handover OTP
+                    </span>
+                    <h4 class="fw-bold mb-2">Show this OTP to Finder / Security Guard</h4>
+                    <p class="text-light opacity-75 small mb-3">
+                        Do NOT share this code over phone. Tell this OTP only when you physically receive your item!
+                    </p>
+                    <div class="otp-display-box my-3">
+                        {{ c['handover_otp'] }}
+                    </div>
+                    <div class="small text-info fw-semibold">
+                        Once the finder enters this 6-digit OTP, the item is marked as Returned.
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- 2. FOUND PERSON (FINDER) VIEW: Enter Owner's OTP -->
+                {% if is_finder or (current_user and current_user['role'] == 'admin') %}
+                <div class="p-4 rounded-4 border border-primary mb-4" style="background: #eff6ff;">
+                    <h5 class="fw-bold text-primary d-flex align-items-center gap-2 mb-2">
+                        <i class="bi bi-key-fill"></i> Complete Handover with Owner's OTP
+                    </h5>
+                    <p class="text-muted small mb-3">
+                        When the owner comes to collect the item (or at security desk), ask them for their <strong>6-digit Secret OTP</strong> and enter it below:
+                    </p>
+
+                    <form method="POST" action="{{ url_for('verify_claim_otp', cid=c['id']) }}" class="d-flex flex-column flex-sm-row gap-2">
+                        <input type="text" name="otp" maxlength="6" pattern="[0-9]{6}" class="form-control rounded-pill text-center fw-bold fs-5" placeholder="Enter 6-digit OTP" required style="letter-spacing: 0.2em;">
+                        <button type="submit" class="btn btn-boomerang px-4 text-nowrap">
+                            <i class="bi bi-check2-circle me-1"></i> Verify OTP & Complete (+50 Karma)
+                        </button>
+                    </form>
+                </div>
+                {% endif %}
+
+            {% elif c['status'] == 'confirmed' %}
+                <div class="alert alert-success rounded-4 p-4 text-center mb-4">
+                    <i class="bi bi-check-circle-fill fs-1 text-success d-block mb-2"></i>
+                    <h4 class="fw-bold text-success mb-1">Handover Successfully Completed!</h4>
+                    <p class="text-muted small mb-0">The OTP was verified, the item has been returned, and +50 Karma Points were awarded to the finder.</p>
+                </div>
+            {% endif %}
+
+            <!-- Contact Information Revealed -->
+            {% if can_finder_see_owner and owner %}
+            <div class="p-4 rounded-4 border border-success mb-4" style="background-color: #ecfdf5;">
+                <h5 class="fw-bold text-success d-flex align-items-center gap-2 mb-2">
+                    <i class="bi bi-unlock-fill"></i> Owner Contact Details
+                </h5>
+                <div class="row g-2 small">
+                    <div class="col-sm-6"><strong>Name:</strong> {{ owner['name'] }} ({{ owner['dept'] }})</div>
+                    <div class="col-sm-6"><strong>Phone:</strong> <a href="tel:{{ owner['phone'] }}">{{ owner['phone'] }}</a></div>
+                    <div class="col-sm-12"><strong>Email:</strong> <a href="mailto:{{ owner['email'] }}">{{ owner['email'] }}</a></div>
+                </div>
+            </div>
+            {% endif %}
+
+            <div class="d-flex justify-content-between align-items-center pt-3 border-top">
+                <a href="{{ url_for('item', iid=it['id']) }}" class="btn btn-light rounded-pill border px-4">Back to Item</a>
+                <a href="{{ url_for('otp_verify_page') }}" class="btn btn-outline-primary rounded-pill btn-sm">Security Desk OTP Page</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        var el = document.getElementById("progressBarEl");
+        if (el) {
+            var w = el.getAttribute("data-width") || "0";
+            el.style.width = w + "%";
+        }
+    });
+</script>
+{% endblock %}

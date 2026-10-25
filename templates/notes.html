@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Notifications — Campus Find It{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card-modern p-4 p-md-5 mb-5">
+            <h3 class="fw-bold mb-3 d-flex align-items-center gap-2">
+                <i class="bi bi-bell-fill text-primary"></i> Notifications Inbox
+            </h3>
+            {% if notes %}
+            <div class="d-flex flex-column gap-2">
+                {% for n in notes %}
+                <div class="p-3 rounded-4 border {% if not n.seen %}bg-primary-subtle border-primary-subtle{% else %}bg-light{% endif %}">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <p class="mb-1 text-dark fw-medium">{{ n.msg }}</p>
+                        <small class="text-muted text-nowrap ms-3">{{ n.created }}</small>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="text-center py-5 text-muted">
+                <i class="bi bi-bell-slash fs-1 d-block mb-2 opacity-50"></i>
+                <p class="mb-0">You're all caught up! No notifications.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

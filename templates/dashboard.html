@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block title %}My Dashboard — Boomerang{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+    <div>
+        <h2 class="fw-extrabold mb-1 text-dark">User Dashboard</h2>
+        <p class="text-muted small mb-0">Track your reported lost belongings and claims.</p>
+    </div>
+    <a href="{{ url_for('lost_new') }}" class="btn btn-boomerang">
+        <i class="bi bi-plus-circle me-1"></i> Report Lost Item
+    </a>
+</div>
+
+<div class="row g-4">
+    <!-- Box 1: Belongings I Reported Lost (IN BLUE THEME) -->
+    <div class="col-lg-6">
+        <div class="p-4 h-100 rounded-5 shadow-lg" style="background: radial-gradient(120% 120% at 50% 0%, #1e3a8a 0%, #0f172a 100%); border: 1px solid rgba(255,255,255,0.1);">
+            <h5 class="fw-bold mb-3 d-flex align-items-center gap-2 text-white border-bottom border-light border-opacity-10 pb-3">
+                <i class="bi bi-inbox-fill text-info"></i> Belongings I Reported Lost ({{ mine|length }})
+            </h5>
+            {% if mine %}
+            <div class="d-flex flex-column gap-2">
+                {% for it in mine %}
+                <div class="p-3 rounded-4 d-flex justify-content-between align-items-center text-white" style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12);">
+                    <div>
+                        <h6 class="fw-bold mb-1"><a href="{{ url_for('item', iid=it.id) }}" class="text-white text-decoration-none">{{ it.name }}</a></h6>
+                        <div class="text-info small">{{ it.category }} • {{ it.date }}</div>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="status-pill status-{{ it.status }}">{{ it.status }}</span>
+                        {% if it.status != 'returned' %}
+                        <form method="POST" action="{{ url_for('got_it', iid=it.id) }}">
+                            <button type="submit" class="btn btn-sm btn-info text-dark fw-bold rounded-pill px-3">I Got It</button>
+                        </form>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="text-center py-5 text-light opacity-75 small">You haven't reported any lost items.</div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Box 2: Found Claims Submitted (IN BLUE THEME) -->
+    <div class="col-lg-6">
+        <div class="p-4 h-100 rounded-5 shadow-lg" style="background: radial-gradient(120% 120% at 50% 0%, #1e3a8a 0%, #0f172a 100%); border: 1px solid rgba(255,255,255,0.1);">
+            <h5 class="fw-bold mb-3 d-flex align-items-center gap-2 text-white border-bottom border-light border-opacity-10 pb-3">
+                <i class="bi bi-hand-thumbs-up-fill text-info"></i> Found Claims Submitted ({{ claims|length }})
+            </h5>
+            {% if claims %}
+            <div class="d-flex flex-column gap-2">
+                {% for c in claims %}
+                <div class="p-3 rounded-4 d-flex justify-content-between align-items-center text-white" style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12);">
+                    <div>
+                        <h6 class="fw-bold mb-1"><a href="{{ url_for('claim', cid=c.id) }}" class="text-white text-decoration-none">{{ c.iname }}</a></h6>
+                        <div class="text-info small">Claimed on {{ c.created }}</div>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="status-pill status-{{ c.status }}">{{ c.status }}</span>
+                        <a href="{{ url_for('claim', cid=c.id) }}" class="btn btn-sm btn-outline-info rounded-pill px-3">View</a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="text-center py-5 text-light opacity-75 small">You haven't claimed any found items yet.</div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
